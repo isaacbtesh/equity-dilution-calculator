@@ -5,9 +5,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Equity Dilution Calculator",
+  title: "VC Investment Calculator",
   description:
-    "Model your equity investment returns with dilution. Calculate net proceeds, MOIC, and ownership dilution across funding rounds.",
+    "Model your venture capital and startup investment returns. Calculate net proceeds, MOIC, IRR, and ownership dilution across funding rounds for direct investments, SPVs, and funds.",
 };
 
 export default function RootLayout({
