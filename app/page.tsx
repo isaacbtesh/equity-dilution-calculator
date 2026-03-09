@@ -263,24 +263,7 @@ export default function VCDilutionCalculator() {
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50">
         <div className="max-w-7xl mx-auto px-4 md:px-8 pt-8 pb-10">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="relative">
-                <div className="w-11 h-11 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-                    />
-                  </svg>
-                </div>
-              </div>
+            <div className="mb-3">
               <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
                 VC Investment Calculator
               </h1>
@@ -756,38 +739,55 @@ export default function VCDilutionCalculator() {
                     <TrendingUp className="w-5 h-5" />
                     Your Returns
                   </h2>
-                  <div
-                    className={`grid gap-4 ${
-                      investmentType === "fund"
-                        ? "grid-cols-3"
-                        : "grid-cols-2"
-                    }`}
-                  >
-                    <div>
-                      <div className="text-blue-200 text-sm mb-1">
-                        Net Proceeds
-                      </div>
-                      <div className="text-3xl font-bold">
-                        {formatCurrency(results.netProceeds)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-blue-200 text-sm mb-1">
-                        Net MOIC
-                      </div>
-                      <div className="text-3xl font-bold">
-                        {formatMOIC(results.netMOIC)}
-                      </div>
-                    </div>
-                    {investmentType === "fund" && results.irr !== undefined && (
+                  {investmentType === "fund" ? (
+                    <div className="space-y-4">
                       <div>
-                        <div className="text-blue-200 text-sm mb-1">IRR</div>
+                        <div className="text-blue-200 text-sm mb-1">
+                          Net Proceeds
+                        </div>
                         <div className="text-3xl font-bold">
-                          {formatPercent(results.irr * 100)}
+                          {formatCurrency(results.netProceeds)}
                         </div>
                       </div>
-                    )}
-                  </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-blue-200 text-sm mb-1">
+                            Net MOIC
+                          </div>
+                          <div className="text-3xl font-bold">
+                            {formatMOIC(results.netMOIC)}
+                          </div>
+                        </div>
+                        {results.irr !== undefined && (
+                          <div>
+                            <div className="text-blue-200 text-sm mb-1">IRR</div>
+                            <div className="text-3xl font-bold">
+                              {formatPercent(results.irr * 100)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-blue-200 text-sm mb-1">
+                          {investmentType === "direct" ? "Total Proceeds" : "Net Proceeds"}
+                        </div>
+                        <div className="text-3xl font-bold">
+                          {formatCurrency(results.netProceeds)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-blue-200 text-sm mb-1">
+                          {investmentType === "direct" ? "Total MOIC" : "Net MOIC"}
+                        </div>
+                        <div className="text-3xl font-bold">
+                          {formatMOIC(results.netMOIC)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Detailed Breakdown - only for direct/spv */}
@@ -887,7 +887,7 @@ export default function VCDilutionCalculator() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-600">Gross Proceeds</span>
+                        <span className="text-slate-600">{investmentType === "direct" ? "Total Proceeds" : "Gross Proceeds"}</span>
                         <div className="relative">
                           <HelpCircle
                             className="w-4 h-4 text-slate-400 cursor-help"
@@ -909,7 +909,7 @@ export default function VCDilutionCalculator() {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-600">Gross MOIC</span>
+                        <span className="text-slate-600">{investmentType === "direct" ? "Total MOIC" : "Gross MOIC"}</span>
                         <div className="relative">
                           <HelpCircle
                             className="w-4 h-4 text-slate-400 cursor-help"
@@ -931,7 +931,7 @@ export default function VCDilutionCalculator() {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-600">Gross Profit</span>
+                        <span className="text-slate-600">{investmentType === "direct" ? "Total Profit" : "Gross Profit"}</span>
                         <div className="relative">
                           <HelpCircle
                             className="w-4 h-4 text-slate-400 cursor-help"
@@ -973,52 +973,56 @@ export default function VCDilutionCalculator() {
                         </span>
                       </div>
                     )}
-                    <div className="flex justify-between items-center py-3 bg-slate-50 rounded-lg px-3 mt-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-800">
-                          Net Proceeds
-                        </span>
-                        <div className="relative">
-                          <HelpCircle
-                            className="w-4 h-4 text-slate-500 cursor-help"
-                            onMouseEnter={() =>
-                              setHoveredTooltip("netProceeds")
-                            }
-                            onMouseLeave={() => setHoveredTooltip(null)}
-                          />
-                          {hoveredTooltip === "netProceeds" && (
-                            <div className="absolute left-6 top-0 w-64 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-xl z-10">
-                              {tooltips.netProceeds}
+                    {investmentType !== "direct" && (
+                      <>
+                        <div className="flex justify-between items-center py-3 bg-slate-50 rounded-lg px-3 mt-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-800">
+                              Net Proceeds
+                            </span>
+                            <div className="relative">
+                              <HelpCircle
+                                className="w-4 h-4 text-slate-500 cursor-help"
+                                onMouseEnter={() =>
+                                  setHoveredTooltip("netProceeds")
+                                }
+                                onMouseLeave={() => setHoveredTooltip(null)}
+                              />
+                              {hoveredTooltip === "netProceeds" && (
+                                <div className="absolute left-6 top-0 w-64 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-xl z-10">
+                                  {tooltips.netProceeds}
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
+                          <span className="font-bold text-green-600 text-lg">
+                            {formatCurrency(results.netProceeds)}
+                          </span>
                         </div>
-                      </div>
-                      <span className="font-bold text-green-600 text-lg">
-                        {formatCurrency(results.netProceeds)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 bg-slate-50 rounded-lg px-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-800">
-                          Net MOIC
-                        </span>
-                        <div className="relative">
-                          <HelpCircle
-                            className="w-4 h-4 text-slate-500 cursor-help"
-                            onMouseEnter={() => setHoveredTooltip("netMOIC")}
-                            onMouseLeave={() => setHoveredTooltip(null)}
-                          />
-                          {hoveredTooltip === "netMOIC" && (
-                            <div className="absolute left-6 top-0 w-64 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-xl z-10">
-                              {tooltips.netMOIC}
+                        <div className="flex justify-between items-center py-3 bg-slate-50 rounded-lg px-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-800">
+                              Net MOIC
+                            </span>
+                            <div className="relative">
+                              <HelpCircle
+                                className="w-4 h-4 text-slate-500 cursor-help"
+                                onMouseEnter={() => setHoveredTooltip("netMOIC")}
+                                onMouseLeave={() => setHoveredTooltip(null)}
+                              />
+                              {hoveredTooltip === "netMOIC" && (
+                                <div className="absolute left-6 top-0 w-64 bg-slate-800 text-white text-xs rounded-lg p-3 shadow-xl z-10">
+                                  {tooltips.netMOIC}
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
+                          <span className="font-bold text-blue-600 text-lg">
+                            {formatMOIC(results.netMOIC)}
+                          </span>
                         </div>
-                      </div>
-                      <span className="font-bold text-blue-600 text-lg">
-                        {formatMOIC(results.netMOIC)}
-                      </span>
-                    </div>
+                      </>
+                    )}
                     {investmentType === "fund" &&
                       results.irr !== undefined && (
                         <div className="flex justify-between items-center py-3 bg-slate-50 rounded-lg px-3">
