@@ -2,7 +2,7 @@
 
 **Models equity investment returns accounting for dilution across funding rounds. Toggle between direct investments and fund/SPV structures with management fees and carry.**
 
-🔗 **[Live demo →](https://equity-dilution-calculator.vercel.app)** _(deploy pending)_
+🔗 **[Try it live →](https://equity-dilution-calculator.vercel.app)**
 
 <!-- TODO: replace with hero screenshot -->
 <!-- ![Dilution Calculator](docs/hero.png) -->
