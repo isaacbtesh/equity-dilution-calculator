@@ -1,16 +1,25 @@
 # Equity Dilution Calculator
 
-A web-based calculator that models equity investment returns accounting for dilution across funding rounds. Built for investors evaluating direct investments or fund/SPV structures.
+**Models equity investment returns accounting for dilution across funding rounds. Toggle between direct investments and fund/SPV structures with management fees and carry.**
 
-## Features
+🔗 **[Live demo →](https://equity-dilution-calculator.vercel.app)** _(deploy pending)_
 
-- **Direct Investment & Fund/SPV modes** - Toggle between investing directly or through a fund with management fees and carry
-- **Dilution modeling** - Simulate ownership dilution across multiple funding rounds
-- **Returns analysis** - Calculate gross/net proceeds, MOIC, and profit after carry
-- **Interactive chart** - Visualize ownership dilution over rounds with Recharts
-- **Tooltips** - Hover explanations for financial terms (MOIC, carry, dilution, SPV, etc.)
+<!-- TODO: replace with hero screenshot -->
+<!-- ![Dilution Calculator](docs/hero.png) -->
 
-## Default Parameters
+## Why I built it
+
+I work in venture and angel investing. Whenever I'm sizing up a check, I want to see what my ownership actually looks like after the next 3-4 rounds — not just at entry. Most online dilution calculators only model one round, ignore SPV economics, or assume you understand carry math. I built this to be the one I'd actually use myself: dilution across N rounds, fund vs. direct, MOIC after carry, all visualized.
+
+## What it does
+
+- **Direct Investment & Fund/SPV modes** — toggle between investing directly or through a fund with management fees and carry
+- **Multi-round dilution modeling** — simulate ownership dilution across however many funding rounds you specify
+- **Full returns analysis** — gross/net proceeds, MOIC, profit after carry
+- **Interactive chart** — Recharts visualization of ownership over rounds
+- **Plain-English tooltips** — hover explanations for MOIC, carry, dilution, SPV, etc. so it's usable without a finance background
+
+## Default scenario
 
 | Parameter | Default |
 |---|---|
@@ -21,31 +30,18 @@ A web-based calculator that models equity investment returns accounting for dilu
 | Carry to VC | 20% |
 | Exit Valuation | $1,000,000,000 |
 
-## Tech Stack
+## Tech
 
-- [Next.js 14](https://nextjs.org/) with App Router
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Recharts](https://recharts.org/) for data visualization
-- [Lucide React](https://lucide.dev/) for icons
+Next.js 14 (App Router) · TypeScript · Tailwind CSS · Recharts · Lucide
 
-## Getting Started
+## Run locally
 
 ```bash
+git clone https://github.com/isaacbtesh/equity-dilution-calculator
+cd equity-dilution-calculator
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+No API keys, no backend — pure client-side math.
 
-## Deploy to Vercel
-
-The easiest way to deploy is with [Vercel](https://vercel.com):
-
-1. Push your code to GitHub
-2. Import the repository on [vercel.com/new](https://vercel.com/new)
-3. Vercel will auto-detect Next.js and deploy
-
-## Author
-
-Built by [@defikito](https://twitter.com/defikito) | [LinkedIn](https://www.linkedin.com/in/isaacbtesh/)
