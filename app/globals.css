@@ -1,3 +1,591 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================================
+   RETRO CALCULATOR DESIGN SYSTEM
+   A 1978 desktop calculator, rendered in CSS.
+   ============================================================ */
+
+@font-face {
+  font-family: "Orbitron";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/orbitron-800.woff2") format("woff2");
+}
+
+:root {
+  /* No webfonts: the machine look comes from a crisp system mono for every
+     numeral and a tight, letter-spaced grotesque for the silkscreen labels. */
+  --font-display: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco,
+    "Cascadia Mono", "Courier New", monospace;
+  --font-body: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Arial, sans-serif;
+  --font-title: "Orbitron", var(--font-display);
+
+  --case: #ded7c4;
+  --case-hi: #efe9da;
+  --case-lo: #b8b1a0;
+  --case-edge: #8e8878;
+  --ink: #2c2b26;
+  --ink-soft: #6b6759;
+  --lcd: #a7b894;
+  --lcd-dim: #93a481;
+  --lcd-ink: #1b2415;
+  --key-dark: #38383a;
+  --key-dark-lo: #232325;
+  --key-shadow: #131314;
+  --orange: #f26a1b;
+  --orange-lo: #d1500a;
+  --orange-shadow: #7e3105;
+  --red: #b3321f;
+  --blue: #2c5f8a;
+  --paper: #f6f2e7;
+}
+
+html,
+body {
+  background-color: #241a12;
+}
+
+body {
+  /* walnut desk */
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(255, 208, 150, 0.16), transparent 60%),
+    repeating-linear-gradient(
+      92deg,
+      rgba(0, 0, 0, 0.22) 0px,
+      rgba(0, 0, 0, 0.22) 1px,
+      rgba(255, 255, 255, 0.015) 1px,
+      rgba(255, 255, 255, 0.015) 4px,
+      rgba(0, 0, 0, 0.1) 4px,
+      rgba(0, 0, 0, 0.1) 7px
+    ),
+    linear-gradient(160deg, #3d2b1d 0%, #2a1d13 45%, #1d140d 100%);
+  background-attachment: fixed;
+  color: var(--ink);
+}
+
+/* ---------- the case ---------- */
+
+/*
+ * Two layers, the way a real calculator is built: a moulded outer shell with a
+ * bevelled edge, and a faceplate recessed into it. Content lives on the
+ * faceplate, so the frame band is free for the screws and nothing sits on top
+ * of the type.
+ */
+.calc-shell {
+  position: relative;
+  border-radius: 26px;
+  background: linear-gradient(
+    180deg,
+    #f2ece0 0%,
+    #e2dbc9 16%,
+    #d3ccba 80%,
+    #b0a996 100%
+  );
+  border: 1px solid #6f6a5c;
+  box-shadow:
+    /* bevel on the frame itself */
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.16),
+    inset 4px 0 6px rgba(0, 0, 0, 0.08),
+    inset -4px 0 6px rgba(0, 0, 0, 0.08),
+    /* stacked edges give the body real thickness */
+    0 2px 0 #a49d8b,
+    0 5px 0 #8e8878,
+    0 9px 0 #6f6a5c,
+    0 12px 0 #55514600,
+    /* it sits on a desk */
+    0 18px 26px rgba(0, 0, 0, 0.45),
+    0 42px 64px rgba(0, 0, 0, 0.5);
+}
+
+/* fine speckled plastic grain */
+.calc-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  pointer-events: none;
+  opacity: 0.32;
+  background-image:
+    radial-gradient(rgba(0, 0, 0, 0.09) 0.5px, transparent 0.5px),
+    radial-gradient(rgba(255, 255, 255, 0.55) 0.5px, transparent 0.5px);
+  background-size: 4px 4px, 5px 5px;
+  background-position: 0 0, 2px 3px;
+}
+
+/* the recessed faceplate everything is mounted on */
+.calc-face {
+  position: relative;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #d8d1be 0%, #cbc4b1 100%);
+  border: 1px solid #8f8878;
+  box-shadow:
+    /* the plate sits down inside the shell */
+    inset 0 6px 14px rgba(0, 0, 0, 0.28),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+    /* and the shell lip catches light just outside it */
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 -1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.calc-panel {
+  background: linear-gradient(180deg, #e9e3d3 0%, #dbd4c1 100%);
+  border: 1px solid #a9a291;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.07),
+    0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* recessed well, for grouping inputs */
+.calc-well {
+  background: linear-gradient(180deg, #cfc8b6 0%, #ddd6c4 100%);
+  border: 1px solid #a9a291;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* brushed aluminium faceplate */
+.brushed {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.5) 0px,
+      rgba(255, 255, 255, 0.5) 1px,
+      rgba(0, 0, 0, 0.05) 1px,
+      rgba(0, 0, 0, 0.05) 2px,
+      rgba(255, 255, 255, 0.18) 2px,
+      rgba(255, 255, 255, 0.18) 3px
+    ),
+    linear-gradient(180deg, #d3d5d6 0%, #a9adaf 45%, #c6c9cb 100%);
+  border: 1px solid #7e8385;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.screw {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, #e9e6dc 0%, #9c9686 55%, #6d6858 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+}
+@media (min-width: 768px) {
+  .screw {
+    width: 11px;
+    height: 11px;
+  }
+}
+.screw::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 6px;
+  height: 1.5px;
+  background: rgba(0, 0, 0, 0.5);
+  transform: rotate(34deg);
+  border-radius: 1px;
+}
+
+/* solar cell strip */
+.solar {
+  background: linear-gradient(100deg, #2a1c34 0%, #40213a 40%, #1d1526 100%);
+  border: 1px solid #14101c;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.16), 0 1px 0 rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+.solar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 22px,
+    rgba(255, 255, 255, 0.22) 22px 23px
+  );
+}
+
+/* ---------- the LCD ---------- */
+
+.lcd {
+  background: linear-gradient(180deg, var(--lcd) 0%, var(--lcd-dim) 100%);
+  border: 1px solid #59634c;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+  color: var(--lcd-ink);
+  position: relative;
+  overflow: hidden;
+}
+
+/* glass glare */
+.lcd::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0.28) 0%, transparent 42%);
+}
+
+.lcd-bezel {
+  background: linear-gradient(180deg, #3b3b38 0%, #26262a 100%);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.lcd-digits {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+/* small status words along the top of a display, like MEMORY / GRAD / DEG */
+.lcd-flag {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lcd-ink);
+  opacity: 0.35;
+  transition: opacity 120ms ease;
+}
+.lcd-flag[data-on="true"] {
+  opacity: 1;
+}
+
+/* ---------- keys ---------- */
+
+.key {
+  --k-hi: #45454a;
+  --k-lo: var(--key-dark-lo);
+  --k-sh: var(--key-shadow);
+  --k-text: #f2efe6;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, var(--k-hi) 0%, var(--k-lo) 100%);
+  color: var(--k-text);
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 4px 0 var(--k-sh),
+    0 6px 10px rgba(0, 0, 0, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  transition: transform 60ms ease, box-shadow 60ms ease, filter 120ms ease;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+}
+/* keys sit in a row above mobile, so keep their caps on one line there */
+@media (min-width: 640px) {
+  .key {
+    white-space: nowrap;
+  }
+}
+.key:hover {
+  filter: brightness(1.12);
+}
+.key:active,
+.key[data-pressed="true"] {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.5),
+    0 0 0 var(--k-sh);
+  filter: brightness(0.96);
+}
+.key:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+.key-orange {
+  --k-hi: #ff8a3d;
+  --k-lo: var(--orange-lo);
+  --k-sh: var(--orange-shadow);
+  --k-text: #241004;
+}
+.key-cream {
+  --k-hi: #efe9da;
+  --k-lo: #cec7b4;
+  --k-sh: #8e8878;
+  --k-text: #2c2b26;
+}
+.key-red {
+  --k-hi: #d6503a;
+  --k-lo: #a92c19;
+  --k-sh: #631409;
+  --k-text: #fff2ee;
+}
+
+/* ---------- inputs ---------- */
+
+.field {
+  width: 100%;
+  background: linear-gradient(180deg, #9fb18c 0%, #adbd9b 100%);
+  border: 1px solid #59634c;
+  border-radius: 5px;
+  color: var(--lcd-ink);
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+  transition: box-shadow 120ms ease, background 120ms ease;
+}
+.field::placeholder {
+  color: rgba(27, 36, 21, 0.42);
+}
+.field:focus {
+  outline: none;
+  background: linear-gradient(180deg, #b3c4a0 0%, #bdcdaa 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.28),
+    0 0 0 2px rgba(242, 106, 27, 0.75);
+}
+
+.field-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+/* the brand plate: heavier, wider, moulded into the case */
+.brand-type {
+  font-family: var(--font-title);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 -1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.plate-label {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* retro slider */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+.slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #7d7767 0%, #a49d8a 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+.slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #7d7767 0%, #a49d8a 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 22px;
+  margin-top: -7px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ff8a3d 0%, var(--orange-lo) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 3px rgba(0, 0, 0, 0.4);
+}
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 22px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ff8a3d 0%, var(--orange-lo) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- printed tape ---------- */
+
+.tape {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 27px,
+      rgba(0, 0, 0, 0.025) 27px 28px
+    ),
+    linear-gradient(180deg, #fbf8ef 0%, var(--paper) 100%);
+  border-left: 1px solid #ddd6c4;
+  border-right: 1px solid #ddd6c4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+/* torn top and bottom edges */
+.tape::before,
+.tape::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background:
+    radial-gradient(circle at 6px -2px, transparent 6px, var(--paper) 6.5px) repeat-x;
+  background-size: 12px 8px;
+}
+.tape::before {
+  top: 0;
+  transform: scaleY(-1);
+}
+.tape::after {
+  bottom: -7px;
+}
+
+.tape-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+}
+@media (min-width: 640px) {
+  .tape-row {
+    gap: 12px;
+  }
+}
+/* leader dots: desktop only, they fill whatever the text leaves behind */
+.tape-dots {
+  flex: 1 1 12px;
+  min-width: 12px;
+  border-bottom: 1px dotted rgba(44, 43, 38, 0.35);
+  transform: translateY(-4px);
+}
+
+/* ---------- misc ---------- */
+
+.tooltip-box {
+  background: #26261f;
+  color: #e9e4d3;
+  border: 1px solid #4d4b3f;
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.led {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #5c1c0c;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+.led[data-on="true"] {
+  background: #ff4f2a;
+  box-shadow: 0 0 8px 2px rgba(255, 79, 42, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.vent {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.1));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- print / save as PDF ---------- */
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    background-image: none !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  main {
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .calc-shell,
+  .calc-face {
+    border-radius: 0;
+    border-color: #bbb;
+    box-shadow: none;
+    background: #fff !important;
+    padding: 0 !important;
+  }
+  .calc-shell::before {
+    display: none;
+  }
+
+  /* controls have no meaning on paper */
+  .key,
+  .screw,
+  .solar,
+  .vent,
+  .slider {
+    display: none !important;
+  }
+
+  /* one column reads better on a page */
+  .print-stack {
+    display: block !important;
+  }
+  .print-stack > * + * {
+    margin-top: 16px;
+  }
+
+  .lcd-bezel {
+    position: static !important;
+  }
+
+  .calc-panel,
+  .calc-well,
+  .calc-face,
+  .lcd-bezel,
+  .tape,
+  table {
+    break-inside: avoid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key,
+  .field,
+  .lcd-flag {
+    transition: none;
+  }
+}
